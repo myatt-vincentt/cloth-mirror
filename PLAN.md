@@ -21,7 +21,9 @@ face folds. Built on SDK 2.0.0-alpha.9. Front camera, one player.
   own point, so two hands stretch the sheet between them. Pulled past the sheet's reach it goes
   taut. Opening the hand or lifting the finger lets go and keeps the motion, so a flick throws.
 - A small glowing Arles ring sits between thumb and index of each hand in view: hollow while
-  open, filled while holding. Real hands always stay in front of the cloth and the sky.
+  open, filled while holding. Real hands always stay in front of the cloth and the sky; while a
+  hand moves too fast for tracking to keep up, it fades behind the cloth instead of showing a
+  stale patch, and comes back as it slows.
 - Hint: low in the middle, a small see-through ghost hand pinches and pulls down, over and
   over, until the first grab (hand or touch); then it fades for good. No text.
 - Four fabrics, picked with wordless glass chips in the control band, each showing a tiny
@@ -48,13 +50,15 @@ face folds. Built on SDK 2.0.0-alpha.9. Front camera, one player.
   light, highlights and sheen; the back is darker and greyer.
 - `useGrabControl.ts`: one grab, whatever holds it: picking the nearest point, the eased
   follow and the lift. `usePointerGrab.ts`: fingers and the mouse; a double-tap re-hangs.
-- `HandGrab.tsx` + `pinch.sim.ts` (unit-tested): hands at 12 fps; a pinch closes at 0.62 and
-  opens at 0.40, must hold two readings, never counts a fist or overlapping hands, and glides
-  smoothly between readings. The rings, and `HandCutout` so the hands stay in front.
+- `HandGrab.tsx` + `pinch.sim.ts` (unit-tested): hands at 12 fps; a pinch closes at 0.62 and opens at 0.40, must hold two readings, never
+  counts a fist or overlapping hands, and glides smoothly between readings. The rings.
+- `LiveHands.tsx`: the live camera picture redrawn inside each hand's outline (the SDK's
+  `writeHandCutout` silhouette) on top of the cloth. Each hand fades with how far its outline
+  may be off (speed × the reading's age, `pinch.sim.ts`), so a lagging outline dissolves.
 - `HeadShake.tsx` + `shake.sim.ts` (unit-tested): the head's turn from face tracking at 15 fps;
   three turning points at least 6° apart within 2.6 s.
 - `PinchHint.tsx`: the SDK ghost hand (`HandGestureHint`, OK pose) on `hand-v1.glb`.
-- `NightSky.tsx`: the night behind, depth-tested at the very back so hands stay in front. `LookChips.tsx`: the fabric chips. `looks.ts`: each fabric's
+- `NightSky.tsx`: the night behind. `LookChips.tsx`: the fabric chips. `looks.ts`: each fabric's
   feel and finish.
 - Dev only: `window.__cloth` (particle count, grid, grab state, look, `setLook`, `rehang`, sim
   time per frame, how far the sheet is from rest, head shakes seen, `bare` / `skyOnly` views).

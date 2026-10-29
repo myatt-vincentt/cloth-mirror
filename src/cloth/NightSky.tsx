@@ -4,7 +4,7 @@
 // everywhere, with a shooting star now and then; a moon with a warm glow
 // sits near the middle; low hills in mist along the bottom. One full-screen
 // shader, no images. It shows wherever the cloth is peeled or crumpled away,
-// and real hands stay in front of it.
+// and real hands stay in front of it (LiveHands.tsx).
 import { useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { ShaderMaterial, Vector2 } from "three";
@@ -165,9 +165,7 @@ export const NightSky = () => {
       new ShaderMaterial({
         vertexShader,
         fragmentShader,
-        // Depth-tested at the very back, so the hands (HandCutout) stay in
-        // front of the sky as well as the cloth.
-        depthTest: true,
+        depthTest: false,
         depthWrite: false,
         uniforms: {
           uRes: { value: new Vector2(1, 1) },
@@ -185,8 +183,8 @@ export const NightSky = () => {
   return (
     <mesh
       ref={ref}
-      // After the camera picture and the hand cut-outs (-900), before the cloth.
-      renderOrder={-899}
+      // Over the camera picture, behind the cloth and the live hands.
+      renderOrder={-998}
       frustumCulled={false}
       material={material}
     >

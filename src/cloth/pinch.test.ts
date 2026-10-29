@@ -5,8 +5,11 @@ import {
   feedGlide,
   feedPinch,
   glideAt,
+  outlineError,
+  outlineTarget,
   pinchState,
   startGlide,
+  stepOutline,
 } from "./pinch.sim";
 
 describe("pinch", () => {
@@ -53,5 +56,20 @@ describe("pinch", () => {
     feedGlide(g, { x: 52, y: 50 }, 83);
     expect(glideAt(g, 1000).x).toBeLessThan(52);
     expect(glideAt(g, 1000).x).toBeGreaterThan(50);
+  });
+});
+
+describe("live hand outline", () => {
+  it("is solid for a still or slow hand and gone for a fast one", () => {
+    expect(outlineTarget(outlineError(0, 80))).toBe(1);
+    expect(outlineTarget(outlineError(0.3, 40))).toBe(1);
+    expect(outlineTarget(outlineError(3, 80))).toBe(0);
+  });
+
+  it("fades out at once and back in gently", () => {
+    const out = stepOutline(1, 0, 1 / 60);
+    const back = stepOutline(0, 1, 1 / 60);
+    expect(out).toBeLessThan(0.55);
+    expect(back).toBeLessThan(0.12);
   });
 });

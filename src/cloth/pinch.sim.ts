@@ -92,3 +92,39 @@ export const feedGlide = (g: Glide, raw: Point, now: number) => {
   g.at = now;
   g.span = span;
 };
+
+/**
+ * The live hand in front of the cloth (LiveHands.tsx) is drawn inside an
+ * outline from tracking, which is a moment behind the picture. These say how
+ * solid it should be: sharp while the outline can only be a little off, gone
+ * while it could show a patch of the old background.
+ */
+export const OUTLINE = {
+  /** Outline error (in hand sizes) still drawn fully, and where it is gone. */
+  sharp: 0.08,
+  gone: 0.24,
+  /** Tracking's own delay on top of the reading's age (ms). */
+  latency: 30,
+  /** Fade speeds (1/s): back in gently, out at once. */
+  rise: 6,
+  fall: 40,
+};
+
+/** How far off the outline may be now, in hand sizes. */
+export const outlineError = (speed: number, ageMs: number) =>
+  speed * ((ageMs + OUTLINE.latency) / 1000);
+
+/** How solid the live hand should be for an outline error. */
+export const outlineTarget = (error: number) => {
+  const t = Math.min(
+    1,
+    Math.max(0, (error - OUTLINE.sharp) / (OUTLINE.gone - OUTLINE.sharp)),
+  );
+  return 1 - t * t * (3 - 2 * t);
+};
+
+/** Ease the hand's solidity towards its target over `dt` seconds. */
+export const stepOutline = (alpha: number, target: number, dt: number) => {
+  const rate = target < alpha ? OUTLINE.fall : OUTLINE.rise;
+  return alpha + (target - alpha) * (1 - Math.exp(-rate * dt));
+};
