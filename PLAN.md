@@ -21,11 +21,15 @@ face folds. Built on SDK 2.0.0-alpha.9. Front camera, one player.
   own point, so two hands stretch the sheet between them. Pulled past the sheet's reach it goes
   taut. Opening the hand or lifting the finger lets go and keeps the motion, so a flick throws.
 - A small glowing Arles ring sits between thumb and index of each hand in view: hollow while
-  open, filled while holding. Real hands always stay in front of the cloth and the sky; while a
-  hand moves too fast for tracking to keep up, it fades behind the cloth instead of showing a
-  stale patch, and comes back as it slows.
-- Hint: low in the middle, a small see-through ghost hand pinches and pulls down, over and
-  over, until the first grab (hand or touch); then it fades for good. No text.
+  open, filled while holding. Closing the pinch pops it (a quick ease-out scale to 1.15 and
+  back with a glow pulse); while holding it breathes softly; letting go leaves a small ripple
+  that spreads and fades.
+- Real hands stay in front of the cloth and the sky. While a hand moves too fast for tracking
+  to keep up, it fades behind the cloth instead of showing a stale patch, and comes back as it
+  slows.
+- Hint: low in the middle, in the ring's style, two small dots (thumb and index) come together
+  into a filled ring, pull down and let go with a ripple, over and over, until the first grab
+  (hand or touch); then it fades for good. No text and no 3D hand.
 - Four fabrics, picked with wordless glass chips in the control band, each showing a tiny
   swatch. The picture is always the fabric's pattern.
   - Silk: soft sheen, flowy, low stiffness.
@@ -50,19 +54,18 @@ face folds. Built on SDK 2.0.0-alpha.9. Front camera, one player.
   light, highlights and sheen; the back is darker and greyer.
 - `useGrabControl.ts`: one grab, whatever holds it: picking the nearest point, the eased
   follow and the lift. `usePointerGrab.ts`: fingers and the mouse; a double-tap re-hangs.
-- `HandGrab.tsx` + `pinch.sim.ts` (unit-tested): hands at 12 fps; a pinch closes at 0.62 and opens at 0.40, must hold two readings, never
-  counts a fist or overlapping hands, and glides smoothly between readings. The rings.
+- `HandGrab.tsx` + `pinch.sim.ts` (unit-tested): hands at 12 fps; a pinch closes at 0.62 and
+  opens at 0.40, must hold two readings, never counts a fist or overlapping hands, and glides
+  smoothly between readings. The rings and their pop, breathing glow and ripple.
 - `LiveHands.tsx`: the live camera picture redrawn inside each hand's outline (the SDK's
   `writeHandCutout` silhouette) on top of the cloth. Each hand fades with how far its outline
   may be off (speed × the reading's age, `pinch.sim.ts`), so a lagging outline dissolves.
 - `HeadShake.tsx` + `shake.sim.ts` (unit-tested): the head's turn from face tracking at 15 fps;
   three turning points at least 6° apart within 2.6 s.
-- `PinchHint.tsx`: the SDK ghost hand (`HandGestureHint`, OK pose) on `hand-v1.glb`.
+- `PinchHint.tsx`: the 2D hint, CSS only.
 - `NightSky.tsx`: the night behind. `LookChips.tsx`: the fabric chips. `looks.ts`: each fabric's
   feel and finish.
-- Dev only: `window.__cloth` (particle count, grid, grab state, look, `setLook`, `rehang`, sim
-  time per frame, how far the sheet is from rest, head shakes seen, `bare` / `skyOnly` views).
-
-## Next
-
-Step 3: polish.
+- Dev only: 1–4 pick a fabric and R re-hangs (`DevKeys.tsx`); `window.__cloth` (particle count,
+  grid, grab state, look, `setLook`, `rehang`, sim time per frame, how far the sheet is from
+  rest, head shakes seen, `bare` / `skyOnly` views) and `window.__hands` (hand reading rate,
+  how solid each live hand is).

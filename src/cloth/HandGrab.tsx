@@ -57,13 +57,34 @@ const GRAB_ID: Record<Side, number> = { left: -1, right: -2 };
 
 const ARLES = "#f4d968";
 const CSS = `
-.cm-ring { position: absolute; left: 0; top: 0; width: 26px; height: 26px; margin: -13px 0 0 -13px;
-  border-radius: 50%; border: 2px solid ${ARLES}; opacity: 0; pointer-events: none;
+.cm-hand { position: absolute; left: 0; top: 0; width: 0; height: 0; pointer-events: none;
+  opacity: 0; transition: opacity 160ms ease-out; }
+.cm-ring { position: absolute; left: -13px; top: -13px; width: 26px; height: 26px;
+  box-sizing: border-box; border-radius: 50%; border: 2px solid ${ARLES};
   box-shadow: 0 0 10px rgb(244 217 104 / .75), inset 0 0 6px rgb(244 217 104 / .45);
-  background: rgb(35 37 40 / .25);
-  transition: opacity 160ms ease-out, background-color 120ms ease-out; }
+  background: rgb(35 37 40 / .25); transition: background-color 120ms ease-out; }
 .cm-ring.on { background: rgb(244 217 104 / .9);
-  box-shadow: 0 0 16px rgb(244 217 104 / .95), 0 0 4px rgb(255 255 255 / .8); }
+  box-shadow: 0 0 16px rgb(244 217 104 / .95), 0 0 4px rgb(255 255 255 / .8);
+  animation: cm-breathe 1.8s ease-out 180ms infinite alternate; }
+.cm-ring.pop { animation: cm-pop 180ms ease-out, cm-breathe 1.8s ease-out 180ms infinite alternate; }
+.cm-ripple-at { position: absolute; left: 0; top: 0; width: 0; height: 0; pointer-events: none; }
+.cm-ripple { position: absolute; left: -13px; top: -13px; width: 26px; height: 26px;
+  box-sizing: border-box; border-radius: 50%; border: 2px solid ${ARLES}; opacity: 0; }
+.cm-ripple.go { animation: cm-ripple 300ms ease-out both; }
+@keyframes cm-pop {
+  0% { transform: scale(1); box-shadow: 0 0 16px rgb(244 217 104 / .95); }
+  45% { transform: scale(1.15); box-shadow: 0 0 26px rgb(244 217 104 / 1), 0 0 8px rgb(255 255 255 / .9); }
+  100% { transform: scale(1); box-shadow: 0 0 16px rgb(244 217 104 / .95); } }
+@keyframes cm-breathe {
+  from { box-shadow: 0 0 14px rgb(244 217 104 / .85), 0 0 4px rgb(255 255 255 / .7); }
+  to { box-shadow: 0 0 22px rgb(244 217 104 / 1), 0 0 6px rgb(255 255 255 / .9); } }
+@keyframes cm-ripple {
+  from { opacity: .85; transform: scale(1); }
+  to { opacity: 0; transform: scale(2); } }
+@media (prefers-reduced-motion: reduce) {
+  .cm-ring.on, .cm-ring.pop { animation: none; }
+  .cm-ripple.go { animation: cm-fade-out 300ms ease-out both; }
+  @keyframes cm-fade-out { from { opacity: .85; } to { opacity: 0; } } }
 `;
 
 type HandRead = {
@@ -96,9 +117,19 @@ export const HandGrab = ({ control }: { control: GrabControl }) => {
       ) as Record<Side, HandRead>,
     [],
   );
-  const rings = useRef<Record<Side, HTMLDivElement | null>>({
-    left: null,
-    right: null,
+  type RingEls = {
+    hand: HTMLDivElement | null;
+    ring: HTMLDivElement | null;
+    rippleAt: HTMLDivElement | null;
+    ripple: HTMLDivElement | null;
+  };
+  const rings = useRef<Record<Side, RingEls>>({
+    left: { hand: null, ring: null, rippleAt: null, ripple: null },
+    right: { hand: null, ring: null, rippleAt: null, ripple: null },
+  });
+  const wasHolding = useRef<Record<Side, boolean>>({
+    left: false,
+    right: false,
   });
   const live = useMemo<Record<Side, LiveHand>>(
     () => ({
@@ -220,12 +251,34 @@ export const HandGrab = ({ control }: { control: GrabControl }) => {
       const at = r.glide ? glideAt(r.glide, now) : null;
       if (at && control.isHolding(id)) control.move(id, at.x, at.y);
 
-      const ring = rings.current[side];
-      if (ring) {
-        ring.style.opacity = seen && at ? "1" : "0";
-        if (at) ring.style.transform = `translate(${at.x}px, ${at.y}px)`;
-        ring.classList.toggle("on", control.isHolding(id));
+      const els = rings.current[side];
+      const holding = control.isHolding(id);
+      if (els.hand && els.ring) {
+        els.hand.style.opacity = seen && at ? "1" : "0";
+        if (at) els.hand.style.transform = `translate(${at.x}px, ${at.y}px)`;
+        if (holding && !wasHolding.current[side]) {
+          // Pinch closed: a quick pop and glow pulse, then a gentle breathing glow.
+          els.ring.classList.remove("pop");
+          els.ring.getBoundingClientRect();
+          els.ring.classList.add("pop");
+        }
+        if (!holding) els.ring.classList.remove("pop");
+        els.ring.classList.toggle("on", holding);
       }
+      if (
+        !holding &&
+        wasHolding.current[side] &&
+        els.ripple &&
+        els.rippleAt &&
+        at
+      ) {
+        // Let go: a small ripple spreads where the hand opened.
+        els.rippleAt.style.transform = `translate(${at.x}px, ${at.y}px)`;
+        els.ripple.classList.remove("go");
+        els.ripple.getBoundingClientRect();
+        els.ripple.classList.add("go");
+      }
+      wasHolding.current[side] = holding;
     });
   });
 
@@ -235,18 +288,36 @@ export const HandGrab = ({ control }: { control: GrabControl }) => {
       <LiveHands hands={liveList} />
       <Html fullscreen zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
         <style>{CSS}</style>
-        <div
-          className="cm-ring"
-          ref={(el) => {
-            rings.current.left = el;
-          }}
-        />
-        <div
-          className="cm-ring"
-          ref={(el) => {
-            rings.current.right = el;
-          }}
-        />
+        {SIDES.map((side) => (
+          <div key={side}>
+            <div
+              className="cm-ripple-at"
+              ref={(el) => {
+                rings.current[side].rippleAt = el;
+              }}
+            >
+              <div
+                className="cm-ripple"
+                ref={(el) => {
+                  rings.current[side].ripple = el;
+                }}
+              />
+            </div>
+            <div
+              className="cm-hand"
+              ref={(el) => {
+                rings.current[side].hand = el;
+              }}
+            >
+              <div
+                className="cm-ring"
+                ref={(el) => {
+                  rings.current[side].ring = el;
+                }}
+              />
+            </div>
+          </div>
+        ))}
       </Html>
     </>
   );

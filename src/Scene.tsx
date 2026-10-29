@@ -4,7 +4,7 @@ import { lazy, Suspense } from "react";
 
 import { ClothScene } from "./cloth/ClothScene";
 
-// Dev-only helper for previewing without a camera. Lazy and behind a
+// Dev-only helpers for previewing without a camera. Lazy and behind a
 // constant esbuild folds to false in production. Two rules:
 // `process.env.NODE_ENV`, not `import.meta.env.DEV` (vincentt-xr/v2-template#112);
 // and write the check INSIDE the ternary — hoisted into a `const`, esbuild
@@ -13,13 +13,18 @@ const DevMediaSwitcher =
   process.env.NODE_ENV !== "production"
     ? lazy(() => import("./DevMediaSwitcher"))
     : null;
+const DevKeys =
+  process.env.NODE_ENV !== "production"
+    ? lazy(() => import("./cloth/DevKeys"))
+    : null;
 
 export const Scene = () => (
   <>
     <ClothScene />
-    {DevMediaSwitcher ? (
+    {DevMediaSwitcher && DevKeys ? (
       <Suspense fallback={null}>
         <DevMediaSwitcher />
+        <DevKeys />
       </Suspense>
     ) : null}
   </>

@@ -1,9 +1,10 @@
 {
-  "title": "XR App - Vincentt",
-  "description": "An AR experience built with Vincentt",
+  "title": "Cloth Mirror",
+  "description": "Your camera picture is a sheet of cloth: pinch it in the air or drag it to peel, fold and crumple it and find a starry night behind",
   "image": "/images/og-default.jpg",
-  "imageAlt": "Vincentt — Augmented Reality App builder",
+  "imageAlt": "Cloth Mirror — a camera experience built with Vincentt",
   "imageWidth": 1200,
   "imageHeight": 630,
-  "imageType": "image/jpeg"
+  "imageType": "image/jpeg",
+  "url": "https://cloth-mirror.vincentt.app"
 }

@@ -1,3 +1,26 @@
+# Cloth Mirror
+
+Your camera picture is a sheet of cloth hanging like a curtain. Pinch it in the air with either
+hand, or drag it with a finger or the mouse, to pull it, peel a corner, fold it over and crumple
+it; two hands stretch it between them. The picture keeps playing live as it bends, so your own
+face folds, and behind it a magical night shows: a twilight glow, an aurora, stars, shooting
+stars and the moon. Let go and it swings back and settles; a double-tap or a quick head shake
+re-hangs it. Four fabrics on glass chips: silk, denim, jelly and foil. The picture fills the
+whole screen.
+
+- The cloth is a CPU Verlet simulation of about 1200 particles, pinned along the top and
+  textured with the live camera picture (`src/cloth/sim.ts`, `ClothSheet.tsx`,
+  `clothMaterial.ts`); the night behind is one shader (`NightSky.tsx`).
+- Grabs from touch, mouse and pinches share one grab (`useGrabControl.ts`); pinches and their
+  rings are in `HandGrab.tsx`, the real hands in front of the cloth in `LiveHands.tsx`, the head
+  shake in `HeadShake.tsx`, the hint in `PinchHint.tsx`.
+- `src/App.tsx` uses a full-window container instead of the 9:16 frame; re-apply after a template
+  upgrade.
+- Dev preview without a camera: the media switcher starts on the SDK's sample video; 1–4 pick a
+  fabric, R re-hangs the sheet. How it works: `PLAN.md`.
+
+---
+
 # v2-template
 
 The Vincentt starter app: a real React + R3F + Vincentt XR SDK (`@vincentt-xr/sdk`)
