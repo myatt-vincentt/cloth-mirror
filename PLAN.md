@@ -8,15 +8,22 @@ face folds. Built on SDK 2.0.0-alpha.9. Front camera, one player.
 
 - The picture fills the whole window. Resting, the cloth lies exactly on the camera picture.
 - It hangs like a curtain: the top corners and a few points along the top edge are pinned, so
-  it can be pulled, peeled and crumpled but always swings back and settles. A double-tap
-  re-hangs it neatly with an ease-out settle.
-- Behind it is a quiet night: a deep blue sky, twinkling stars, a faint Milky Way, a soft moon
-  with a warm glow, thin clouds and low hills in mist. One full-screen shader, no images.
+  it can be pulled, peeled and crumpled but always swings back and settles. A double-tap or a
+  quick head shake (left, right, left) re-hangs it neatly with an ease-out settle.
+- Behind it is a magical night just after sunset: a rosy, peach twilight glow along the
+  horizon fading up into deep blue, a soft green-to-violet aurora rippling across the middle,
+  bright twinkling stars everywhere with a shooting star now and then, a moon with a warm glow
+  near the middle, and low hills in mist. One full-screen shader, no images.
 - The back of the cloth shows a darker, greyer copy of the picture, so folds read clearly.
-- Grab with a finger or the mouse: the nearest cloth point within reach is held with a small
-  patch around it and follows the finger smoothly, lifting towards you the further it travels,
-  so a corner peels up and folds over. Each finger holds its own point. Pulled past the sheet's
-  reach it goes taut. Letting go keeps the finger's motion.
+- Grab with a pinch in the air (thumb to index), a finger or the mouse: the nearest cloth point
+  within reach is held with a small patch around it and follows smoothly, lifting towards you
+  the further it travels, so a corner peels up and folds over. Each hand or finger holds its
+  own point, so two hands stretch the sheet between them. Pulled past the sheet's reach it goes
+  taut. Opening the hand or lifting the finger lets go and keeps the motion, so a flick throws.
+- A small glowing Arles ring sits between thumb and index of each hand in view: hollow while
+  open, filled while holding. Real hands always stay in front of the cloth and the sky.
+- Hint: low in the middle, a small see-through ghost hand pinches and pulls down, over and
+  over, until the first grab (hand or touch); then it fades for good. No text.
 - Four fabrics, picked with wordless glass chips in the control band, each showing a tiny
   swatch. The picture is always the fabric's pattern.
   - Silk: soft sheen, flowy, low stiffness.
@@ -39,12 +46,19 @@ face folds. Built on SDK 2.0.0-alpha.9. Front camera, one player.
   further down the sheet so folds never flicker against the part below.
 - `clothMaterial.ts`: the fabric shader. Lying flat, the front is the picture itself; folds take
   light, highlights and sheen; the back is darker and greyer.
-- `usePointerGrab.ts`: finger and mouse grabs, eased; a double-tap re-hangs.
-- `NightSky.tsx`: the night behind. `LookChips.tsx`: the fabric chips. `looks.ts`: each fabric's
+- `useGrabControl.ts`: one grab, whatever holds it: picking the nearest point, the eased
+  follow and the lift. `usePointerGrab.ts`: fingers and the mouse; a double-tap re-hangs.
+- `HandGrab.tsx` + `pinch.sim.ts` (unit-tested): hands at 12 fps; a pinch closes at 0.62 and
+  opens at 0.40, must hold two readings, never counts a fist or overlapping hands, and glides
+  smoothly between readings. The rings, and `HandCutout` so the hands stay in front.
+- `HeadShake.tsx` + `shake.sim.ts` (unit-tested): the head's turn from face tracking at 15 fps;
+  three turning points at least 6° apart within 2.6 s.
+- `PinchHint.tsx`: the SDK ghost hand (`HandGestureHint`, OK pose) on `hand-v1.glb`.
+- `NightSky.tsx`: the night behind, depth-tested at the very back so hands stay in front. `LookChips.tsx`: the fabric chips. `looks.ts`: each fabric's
   feel and finish.
 - Dev only: `window.__cloth` (particle count, grid, grab state, look, `setLook`, `rehang`, sim
-  time per frame, how far the sheet is from rest).
+  time per frame, how far the sheet is from rest, head shakes seen, `bare` / `skyOnly` views).
 
 ## Next
 
-Step 2: pinch in the air with either hand to grab, two hands to stretch, a hint, and polish.
+Step 3: polish.

@@ -25,6 +25,14 @@ export const useLook = () => useSyncExternalStore(subscribe, getLook, getLook);
 
 /**
  * Dev only: `bare` hides the cloth and the night sky, leaving the plain
- * camera picture, to check the resting cloth matches it.
+ * camera picture, to check the resting cloth matches it; `skyOnly` hides
+ * just the cloth.
  */
-export const devView = { bare: false };
+export const devView = { bare: false, skyOnly: false };
+
+/** Whether anyone has grabbed the cloth yet (the hint goes for good then). */
+let grabbedOnce = false;
+export const markGrabbed = () => {
+  grabbedOnce = true;
+};
+export const hasGrabbed = () => grabbedOnce;
