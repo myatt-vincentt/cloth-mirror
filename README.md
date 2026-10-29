@@ -8,6 +8,7 @@ stars and the moon. Let go and it swings back and settles; a double-tap or a qui
 re-hangs it. Four fabrics on glass chips: silk, denim, jelly and foil. The picture fills the
 whole screen.
 
+- Thumbnail: `public/images/cloth-mirror-thumbnail.jpg` (the share image).
 - The cloth is a CPU Verlet simulation of about 1200 particles, pinned along the top and
   textured with the live camera picture (`src/cloth/sim.ts`, `ClothSheet.tsx`,
   `clothMaterial.ts`); the night behind is one shader (`NightSky.tsx`).
